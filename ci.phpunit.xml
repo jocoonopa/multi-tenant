@@ -26,6 +26,7 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="Phei9thoong3ai8aqu4ieHie6kee1zee"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
         <env name="DB_DATABASE" value="testing"/>
         <env name="IN_CI" value="1"/>
         <env name="LIMIT_UUID_LENGTH_32" value="1"/>
