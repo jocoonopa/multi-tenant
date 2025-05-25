@@ -9,8 +9,12 @@
     executionOrder="random"
 >
     <testsuites>
+        <testsuite name="Installation Test Suite">
+            <file>./tests/unit-tests/InstallationTest.php</file>
+        </testsuite>
         <testsuite name="Continued Test Suite">
             <directory suffix=".php">./tests/unit-tests/</directory>
+            <exclude>./tests/unit-tests/InstallationTest.php</exclude>
             <exclude>./tests/unit-tests/Commands/DatabaseCommand.php</exclude>
         </testsuite>
     </testsuites>
