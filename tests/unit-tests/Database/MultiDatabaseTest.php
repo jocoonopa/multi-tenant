@@ -56,8 +56,20 @@ class MultiDatabaseTest extends Test
 
     protected function listDatabases(string $connection = null): array
     {
-        return collect(DB::connection($connection)->select("SHOW DATABASES"))
-            ->pluck('Database')
-            ->toArray();
+        $driver = DB::connection($connection)->getDriverName();
+
+        return match ($driver) {
+            'mysql' => collect(DB::connection($connection)->select('SHOW DATABASES'))
+                ->pluck('Database')
+                ->toArray(),
+
+            'pgsql' => collect(DB::connection($connection)->select('
+                SELECT datname FROM pg_database WHERE datistemplate = false;
+            '))
+                ->pluck('datname')
+                ->toArray(),
+
+            default => throw new \RuntimeException("Unsupported DB driver: {$driver}"),
+        };
     }
 }
