@@ -106,7 +106,12 @@ class DatabaseGenerator
     {
         $host = Arr::get($config, 'host');
 
-        if (! in_array($host, ['localhost', '127.0.0.1', '192.168.0.1'])) {
+        if (! in_array($host, [
+            'localhost',
+            // For GithubActio Bridge IP problem
+            //'127.0.0.1',
+            '192.168.0.1',
+        ])) {
             $config['host'] = '%';
         }
     }
