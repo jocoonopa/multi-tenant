@@ -25,6 +25,16 @@ jobs:
         include:
           - php-version: 8.2
             server-type: nginx
+          - php-version: 8.3
+            server-type: nginx
+          - php-version: 8.4
+            server-type: nginx
+          - php-version: 8.2
+            server-type: apache
+          - php-version: 8.3
+            server-type: apache
+          - php-version: 8.4
+            server-type: apache
 
     services:
       mysql:
@@ -112,3 +122,54 @@ jobs:
 
       - name: Run PHPUnit (PostgreSQL - schema mode)
         run: DB_CONNECTION=pgsql DB_HOST=127.0.0.1 TENANCY_SYSTEM_CONNECTION_NAME=pgsql TENANCY_DATABASE_DIVISION_MODE=schema ./vendor/bin/phpunit -c ci.phpunit.xml tests/unit-tests/Database/ConnectionTest.php
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_DATABASE: testing
+          MYSQL_USER: testing
+          MYSQL_PASSWORD: testing
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_HOST: "%"
+        ports:
+          - 3306:3306
+
+    env:
+      DB_USERNAME: testing
+      DB_PASSWORD: testing
+      DB_DATABASE: testing
+      APP_KEY: deela5kinohw0haekoothahSh8eexach
+      IN_CI: 1
+      TENANCY_SYSTEM_CONNECTION_NAME: mysql
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP with Xdebug
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: xdebug
+          extensions: pdo_mysql
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install -n --prefer-dist --no-progress -o
+
+      - name: Wait for DB
+        run: sleep 10
+
+      - name: Grant privileges
+        run: |
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
+
+      - name: Run PHPUnit with coverage
+        run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 ./vendor/bin/phpunit -c ci.phpunit.xml --coverage-clover=coverage.xml
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3

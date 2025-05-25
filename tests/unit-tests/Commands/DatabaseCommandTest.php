@@ -19,6 +19,9 @@ use Hyn\Tenancy\Tests\Test;
 use Hyn\Tenancy\Tests\Traits\InteractsWithMigrations;
 use Illuminate\Contracts\Foundation\Application;
 
+/**
+ * @doesNotPerformAssertions
+ */
 abstract class DatabaseCommandTest extends Test
 {
     use InteractsWithMigrations;
