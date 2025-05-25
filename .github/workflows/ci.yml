@@ -92,10 +92,9 @@ jobs:
         run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3307 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml
 
       - name: Debug via SSH (only on failure)
-        if: ${{ failure() }}
+        if: ${{ always() }}
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 30
-        if: ${{ always() }}
 
       - name: Run PHPUnit (MySQL - mysql)
         run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3306 LIMIT_UUID_LENGTH_32=1 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml
