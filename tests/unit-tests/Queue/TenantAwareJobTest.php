@@ -79,7 +79,10 @@ class TenantAwareJobTest extends Test
         Event::fake();
 
         $job = new TestJob();
-        \dispatch($job);
+        // little experiment
+        //\dispatch($job);
+        //
+        dispatch_sync($job);
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->payload()['website_id'] === $this->website->id;

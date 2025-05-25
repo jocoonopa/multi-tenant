@@ -17,6 +17,7 @@ namespace Hyn\Tenancy\Tests\Database;
 use Hyn\Tenancy\Database\Connection;
 use Hyn\Tenancy\Tests\Test;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\DB;
 
 class MultiDatabaseTest extends Test
 {
@@ -50,9 +51,13 @@ class MultiDatabaseTest extends Test
         // make sure the Website model still uses the regular system name.
         $this->assertEquals(app(Connection::class)->systemName(), $this->website->getConnectionName());
 
-        $this->assertTrue(in_array(
-            $this->website->uuid,
-            $this->getConnection('secondary')->getDoctrineSchemaManager()->listDatabases()
-        ));
+        $this->assertTrue(in_array($this->website->uuid, $this->listDatabases('secondary')));
+    }
+
+    protected function listDatabases(string $connection = null): array
+    {
+        return collect(DB::connection($connection)->select("SHOW DATABASES"))
+            ->pluck('Database')
+            ->toArray();
     }
 }
