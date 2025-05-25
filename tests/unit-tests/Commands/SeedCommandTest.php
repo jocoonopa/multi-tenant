@@ -20,7 +20,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Hyn\Tenancy\Tests\Seeds\SampleSeeder;
 use Illuminate\Support\Facades\Schema;
 
-class SeedCommandTest extends DatabaseCommandTest
+class SeedCommandTest extends DatabaseCommand
 {
     /**
      * @test
