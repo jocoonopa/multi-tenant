@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="vendor/autoload.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
+<phpunit
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    stopOnFailure="false"
+    processIsolation="false"
+    failOnRisky="true"
+    failOnWarning="true"
+    executionOrder="random"
 >
     <testsuites>
-        <testsuite name="Installation Test Suite">
-            <file>./tests/unit-tests/InstallationTest.php</file>
-        </testsuite>
         <testsuite name="Continued Test Suite">
             <directory suffix=".php">./tests/unit-tests/</directory>
-            <exclude>./tests/unit-tests/InstallationTest.php</exclude>
             <exclude>./tests/unit-tests/Commands/DatabaseCommand.php</exclude>
         </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">./src</directory>
         </include>
     </coverage>
     <php>
