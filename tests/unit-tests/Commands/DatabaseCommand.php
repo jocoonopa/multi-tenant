@@ -22,7 +22,7 @@ use Illuminate\Contracts\Foundation\Application;
 /**
  * @doesNotPerformAssertions
  */
-abstract class DatabaseCommand extends Test
+class DatabaseCommand extends Test
 {
     use InteractsWithMigrations;
 
