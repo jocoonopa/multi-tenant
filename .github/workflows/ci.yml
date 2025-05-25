@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - "*.x"
+      - "*_ci"
   pull_request:
     branches:
       - main
       - "*.x"
+      - "*_ci"
 
 jobs:
   test:
