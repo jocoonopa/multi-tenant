@@ -16,9 +16,7 @@
         <testsuite name="Continued Test Suite">
             <directory suffix=".php">./tests/unit-tests/</directory>
             <exclude>./tests/unit-tests/InstallationTest.php</exclude>
-            <exclude>
-                <file>./tests/unit-tests/Commands/DatabaseCommand.php</file>
-            </exclude>
+            <exclude>./tests/unit-tests/Commands/DatabaseCommand.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
