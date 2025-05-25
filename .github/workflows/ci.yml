@@ -72,6 +72,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect Docker bridge IP and export as DB_HOST
+        run: |
+          BRIDGE_IP=$(ip route | grep default | awk '{print $3}')
+          echo "DB_HOST=$BRIDGE_IP" >> $GITHUB_ENV
+          echo "TENANCY_DB_HOST=$BRIDGE_IP" >> $GITHUB_ENV
+
       - name: Set DB env
         run: |
           echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
@@ -92,21 +98,19 @@ jobs:
 
       - name: Grant privileges
         run: |
+          BRIDGE_IP=$(ip route | grep default | awk '{print $3}')
+
           # MariaDB (port 3307)
           mysql --host=127.0.0.1 --port=3307 -uroot -e "
-            CREATE USER IF NOT EXISTS 'testing'@'%' IDENTIFIED BY 'testing';
-            CREATE USER IF NOT EXISTS 'testing'@'172.%.%.%' IDENTIFIED BY 'testing';
-            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;
-            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'172.%.%.%' WITH GRANT OPTION;
+            CREATE USER IF NOT EXISTS 'testing'@'$BRIDGE_IP' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'$BRIDGE_IP' WITH GRANT OPTION;
             FLUSH PRIVILEGES;
           "
 
           # MySQL (port 3306)
           mysql --host=127.0.0.1 --port=3306 -uroot -e "
-            CREATE USER IF NOT EXISTS 'testing'@'%' IDENTIFIED BY 'testing';
-            CREATE USER IF NOT EXISTS 'testing'@'172.%.%.%' IDENTIFIED BY 'testing';
-            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;
-            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'172.%.%.%' WITH GRANT OPTION;
+            CREATE USER IF NOT EXISTS 'testing'@'$BRIDGE_IP' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'$BRIDGE_IP' WITH GRANT OPTION;
             FLUSH PRIVILEGES;
           "
 
@@ -150,6 +154,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect Docker bridge IP and export as DB_HOST
+        run: |
+          BRIDGE_IP=$(ip route | grep default | awk '{print $3}')
+          echo "DB_HOST=$BRIDGE_IP" >> $GITHUB_ENV
+          echo "TENANCY_DB_HOST=$BRIDGE_IP" >> $GITHUB_ENV
+
       - name: Set up PHP with Xdebug
         uses: shivammathur/setup-php@v2
         with:
@@ -163,6 +173,24 @@ jobs:
 
       - name: Wait for DB
         run: sleep 10
+
+      - name: Grant privileges
+        run: |
+          BRIDGE_IP=$(ip route | grep default | awk '{print $3}')
+
+          # MariaDB (port 3307)
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "
+            CREATE USER IF NOT EXISTS 'testing'@'$BRIDGE_IP' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'$BRIDGE_IP' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
+
+          # MySQL (port 3306)
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "
+            CREATE USER IF NOT EXISTS 'testing'@'$BRIDGE_IP' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'$BRIDGE_IP' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
 
       - name: Grant privileges
         run: mysql --host=127.0.0.1 --port=3306 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
