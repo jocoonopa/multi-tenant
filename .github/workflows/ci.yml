@@ -89,8 +89,16 @@ jobs:
       - name: Grant privileges
         run: |
           # 確保 root 可以 CREATE USER, CREATE DATABASE
-          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
-          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "
+            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '';
+            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "
+            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '';
+            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
 
           # 原本的 testing user 權限仍保留
           mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
