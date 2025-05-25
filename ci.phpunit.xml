@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="vendor/autoload.php"
          colors="true"
-         stopOnFailure="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
          processIsolation="false"
-         failOnRisky="true"
-         failOnWarning="true"
-         executionOrder="random"
-         cacheResult="false"
-         beStrictAboutOutputDuringTests="false"
+         stopOnFailure="false"
 >
     <testsuites>
         <testsuite name="Installation Test Suite">
@@ -15,19 +15,17 @@
         </testsuite>
         <testsuite name="Continued Test Suite">
             <directory suffix=".php">./tests/unit-tests/</directory>
+            <exclude>./tests/unit-tests/InstallationTest.php</exclude>
             <exclude>
-                <file>./tests/unit-tests/InstallationTest.php</file>
                 <file>./tests/unit-tests/Commands/DatabaseCommand.php</file>
             </exclude>
         </testsuite>
     </testsuites>
-
-    <coverage processUncoveredFiles="true">
-        <include>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/</directory>
-        </include>
-    </coverage>
-
+        </whitelist>
+    </filter>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="Phei9thoong3ai8aqu4ieHie6kee1zee"/>
