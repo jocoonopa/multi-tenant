@@ -5,10 +5,16 @@ on:
     branches:
       - main
       - "*.x"
+      - "*_ci"
   pull_request:
     branches:
       - main
       - "*.x"
+      - "*_ci"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -16,8 +22,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [8.2, 8.3, 8.4]
-        server-type: [apache, nginx]
+        include:
+          - php-version: 8.2
+            server-type: nginx
+          - php-version: 8.3
+            server-type: nginx
+          - php-version: 8.4
+            server-type: nginx
+          - php-version: 8.2
+            server-type: apache
+          - php-version: 8.3
+            server-type: apache
+          - php-version: 8.4
+            server-type: apache
 
     services:
       mysql:
@@ -81,12 +98,21 @@ jobs:
 
       - name: Grant privileges
         run: |
-          mysql --host=127.0.0.1 --port=3306 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
-          mysql --host=127.0.0.1 --port=3307 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
+
           PGPASSWORD=testing psql -h 127.0.0.1 -U testing -c "GRANT ALL ON SCHEMA public TO testing;" testing
 
       - name: Run PHPUnit (MySQL - mariadb)
         run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3307 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml
+
+      # - name: Debug via SSH (only on failure)
+      #   if: ${{ always() }}
+      #   uses: mxschmitt/action-tmate@v3
+      #   timeout-minutes: 30
 
       - name: Run PHPUnit (MySQL - mysql)
         run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3306 LIMIT_UUID_LENGTH_32=1 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml
@@ -97,48 +123,54 @@ jobs:
       - name: Run PHPUnit (PostgreSQL - schema mode)
         run: DB_CONNECTION=pgsql DB_HOST=127.0.0.1 TENANCY_SYSTEM_CONNECTION_NAME=pgsql TENANCY_DATABASE_DIVISION_MODE=schema ./vendor/bin/phpunit -c ci.phpunit.xml tests/unit-tests/Database/ConnectionTest.php
 
-  coverage:
-    runs-on: ubuntu-latest
-    services:
-      mariadb:
-        image: mariadb:latest
-        env:
-          MYSQL_DATABASE: testing
-          MYSQL_USER: testing
-          MYSQL_PASSWORD: testing
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_ROOT_HOST: "%"
-        ports:
-          - 3306:3306
+  # 1) No filter is configured, code coverage will not be processed
+  # coverage:
+  #   runs-on: ubuntu-latest
 
-    env:
-      DB_USERNAME: testing
-      DB_PASSWORD: testing
-      DB_DATABASE: testing
-      APP_KEY: deela5kinohw0haekoothahSh8eexach
+  #   services:
+  #     mariadb:
+  #       image: mariadb:latest
+  #       env:
+  #         MYSQL_DATABASE: testing
+  #         MYSQL_USER: testing
+  #         MYSQL_PASSWORD: testing
+  #         MYSQL_ALLOW_EMPTY_PASSWORD: yes
+  #         MYSQL_ROOT_HOST: "%"
+  #       ports:
+  #         - 3306:3306
 
-    steps:
-      - uses: actions/checkout@v4
+  #   env:
+  #     DB_USERNAME: testing
+  #     DB_PASSWORD: testing
+  #     DB_DATABASE: testing
+  #     APP_KEY: deela5kinohw0haekoothahSh8eexach
+  #     IN_CI: 1
+  #     TENANCY_SYSTEM_CONNECTION_NAME: mysql
 
-      - name: Set up PHP with Xdebug
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.4
-          extensions: pdo_mysql, xdebug
-          tools: composer
-          coverage: xdebug
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: composer install -n --prefer-dist --no-progress -o
+  #     - name: Set up PHP with Xdebug
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: 8.4
+  #         coverage: xdebug
+  #         extensions: pdo_mysql
+  #         tools: composer
 
-      - name: Wait for DB
-        run: sleep 10
+  #     - name: Install dependencies
+  #       run: composer install -n --prefer-dist --no-progress -o
 
-      - name: Grant privileges
-        run: mysql --host=127.0.0.1 --port=3306 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
+  #     - name: Wait for DB
+  #       run: sleep 10
 
-      - name: Run PHPUnit with coverage
-        run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml --coverage-clover=coverage.xml
+  #     - name: Grant privileges
+  #       run: |
+  #         mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+  #         mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
 
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v3
+  #     - name: Run PHPUnit with coverage
+  #       run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 ./vendor/bin/phpunit -c ci.phpunit.xml --coverage-clover=coverage.xml
+
+  #     - name: Upload to Codecov
+  #       uses: codecov/codecov-action@v3
