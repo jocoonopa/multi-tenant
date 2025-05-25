@@ -109,7 +109,7 @@ class DatabaseGenerator
         if (! in_array($host, [
             'localhost',
             // For GithubActio Bridge IP problem
-            //'127.0.0.1',
+            app()->environment('testing') ? null : '127.0.0.1',
             '192.168.0.1',
         ])) {
             $config['host'] = '%';
