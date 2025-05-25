@@ -84,8 +84,15 @@ jobs:
 
       - name: Grant privileges
         run: |
-          mysql --host=127.0.0.1 --port=3306 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
-          mysql --host=127.0.0.1 --port=3307 -uroot -e "grant all privileges on *.* to 'testing'@'%' with grant option;"
+          # 確保 root 可以 CREATE USER, CREATE DATABASE
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+
+          # 原本的 testing user 權限仍保留
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
+          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
+
+          # PostgreSQL 權限設定
           PGPASSWORD=testing psql -h 127.0.0.1 -U testing -c "GRANT ALL ON SCHEMA public TO testing;" testing
 
       - name: Run PHPUnit (MySQL - mariadb)
