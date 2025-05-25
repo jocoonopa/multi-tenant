@@ -18,6 +18,9 @@
             <exclude>./tests/unit-tests/InstallationTest.php</exclude>
         </testsuite>
     </testsuites>
+    <exclude>
+        <file>./tests/unit-tests/Commands/DatabaseCommand.php</file>
+    </exclude>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/</directory>
