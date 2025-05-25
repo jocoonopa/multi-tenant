@@ -92,24 +92,23 @@ jobs:
 
       - name: Grant privileges
         run: |
-          # 確保 root 可以 CREATE USER, CREATE DATABASE
-          mysql --host=127.0.0.1 --port=3306 -uroot -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;
-          "
+          # MariaDB (port 3307)
           mysql --host=127.0.0.1 --port=3307 -uroot -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            CREATE USER IF NOT EXISTS 'testing'@'%' IDENTIFIED BY 'testing';
+            CREATE USER IF NOT EXISTS 'testing'@'172.%.%.%' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'172.%.%.%' WITH GRANT OPTION;
             FLUSH PRIVILEGES;
           "
 
-          # 原本的 testing user 權限仍保留
-          mysql --host=127.0.0.1 --port=3306 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
-          mysql --host=127.0.0.1 --port=3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;"
-
-          # PostgreSQL 權限設定
-          PGPASSWORD=testing psql -h 127.0.0.1 -U testing -c "GRANT ALL ON SCHEMA public TO testing;" testing
+          # MySQL (port 3306)
+          mysql --host=127.0.0.1 --port=3306 -uroot -e "
+            CREATE USER IF NOT EXISTS 'testing'@'%' IDENTIFIED BY 'testing';
+            CREATE USER IF NOT EXISTS 'testing'@'172.%.%.%' IDENTIFIED BY 'testing';
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'%' WITH GRANT OPTION;
+            GRANT ALL PRIVILEGES ON *.* TO 'testing'@'172.%.%.%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
 
       - name: Run PHPUnit (MySQL - mariadb)
         run: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3307 TENANCY_SYSTEM_CONNECTION_NAME=mysql ./vendor/bin/phpunit -c ci.phpunit.xml
