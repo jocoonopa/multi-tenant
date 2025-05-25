@@ -72,6 +72,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set DB env
+        run: |
+          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
