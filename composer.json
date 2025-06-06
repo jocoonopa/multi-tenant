@@ -1,6 +1,6 @@
 {
-    "name": "hyn/multi-tenant",
-    "description": "Run multiple websites using the same laravel installation while keeping tenant specific data separated for fully independant multi-domain setups.",
+    "name": "jocoonopa/multi-tenant",
+    "description": "hyn/multi-tenant support laravel-12 ",
     "keywords": [
         "laravel",
         "multi-tenant",
@@ -12,14 +12,13 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Daniël Klabbers",
-            "email": "daniel+hyn@klabbers.email",
-            "homepage": "https://luceos.com"
+            "name": "jocoonopa",
+            "email": "jocoonopa@gmail.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/hyn/multi-tenant/issues",
-        "source": "https://github.com/hyn/multi-tenant",
+        "issues": "https://github.com/jocoonopa/multi-tenant/issues",
+        "source": "https://github.com/jocoonopa/multi-tenant",
         "docs": "https://tenancy.dev"
     },
     "require": {
