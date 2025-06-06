@@ -6,11 +6,6 @@ on:
       - main
       - "*.x"
       - "*_ci"
-  pull_request:
-    branches:
-      - main
-      - "*.x"
-      - "*_ci"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
