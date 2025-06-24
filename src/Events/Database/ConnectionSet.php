@@ -38,7 +38,8 @@ class ConnectionSet extends AbstractEvent
      */
     public $purged;
 
-    public function __construct(?Website $website = null, string $connection, bool $purged = true)
+    // TODO: PHP 8.x compatibility - swap constructor params order before upgrading to PHP 8.4+
+    public function __construct(Website|null $website = null, string $connection, bool $purged = true)
     {
         $this->website = $website;
         $this->connection = $connection;
