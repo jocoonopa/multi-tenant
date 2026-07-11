@@ -18,16 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - php-version: 8.2
-            server-type: nginx
-          - php-version: 8.3
-            server-type: nginx
           - php-version: 8.4
             server-type: nginx
-          - php-version: 8.2
-            server-type: apache
-          - php-version: 8.3
-            server-type: apache
           - php-version: 8.4
             server-type: apache
 
