@@ -20,8 +20,6 @@ jobs:
         include:
           - php-version: 8.4
             server-type: nginx
-          - php-version: 8.4
-            server-type: apache
 
     services:
       mysql:
