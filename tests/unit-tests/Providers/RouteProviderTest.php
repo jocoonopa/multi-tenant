@@ -50,7 +50,15 @@ EOM
     {
         $this->overrideGlobalRoute();
 
-        $this->assertEquals(3, $this->app['router']->getRoutes()->count());
+        $routes = $this->app['router']->getRoutes();
+
+        // The tenant route is registered by name...
+        $this->assertNotNull($routes->getByName('tenant'));
+        // ...on top of the global routes, which are kept (unlike replaces_global_route,
+        // which wipes them and asserts a single remaining route). Asserting more-than-one
+        // route keeps this robust against framework-default routes (e.g. /up, storage.local)
+        // that vary between Laravel versions.
+        $this->assertGreaterThan(1, $routes->count());
     }
 
     /**
